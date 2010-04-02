@@ -14,7 +14,7 @@
      * Extending jQuery namespace, we
      * could add public methods here
      */
-	$.editableText = {};
+    $.editableText = {};
     $.editableText.defaults = {		 
 		/**
 		 * Pass true to enable line breaks.
@@ -43,26 +43,29 @@
 			var prevValue = editable.html();
 			
 			// Create edit/save buttons
-            var buttons = $(
-				"<div class='editableToolbar'>" +
-            		"<a href='#' class='edit'></a>" +
-            		"<a href='#' class='save'></a>" +
-            		"<a href='#' class='cancel'></a>" +
-            	"</div>")
-				.insertBefore(editable);
+	                var buttons = $(
+				"<span class='editableToolbar'>" +
+                		"<a href='#' class='edit'>edit</a>" +
+                		"<a href='#' class='save'>save</a>" +
+                		"<a href='#' class='cancel'>cancel</a>" +
+	                	"</span>")
+				.insertAfter(editable);
 			
 			// Save references and attach events            
 			var editEl = buttons.find('.edit').click(function() {
 				startEditing();
 				return false;
-			});							
+			});
 			
-			buttons.find('.save').click(function(){
+			var saveFunction = function () {
 				stopEditing();
 				editable.trigger(options.changeEvent);
+				prevValue = editable.html();
 				return false;
-			});
-						
+			};
+
+			buttons.find('.save').click(saveFunction);
+
 			buttons.find('.cancel').click(function(){
 				stopEditing();
 				editable.html(prevValue);
@@ -77,7 +80,11 @@
 				// Prevents user from adding newlines to headers, links, etc.
 				editable.keypress(function(event){
 					// event is cancelled if enter is pressed
-					return event.which != 13;
+					if (event.which == 13) {
+					    saveFunction();
+					} else {
+					    return true;
+					}
 				});
 			}
 			
@@ -85,10 +92,10 @@
 			 * Makes element editable
 			 */
 			function startEditing(){               
-                buttons.children().show();
-                editEl.hide();
-				                
-	            editable.attr('contentEditable', true);
+			    buttons.children().show();
+	                    editEl.hide();
+		            editable.attr('contentEditable', true);
+			    editable.focus();
 			}
 			/**
 			 * Makes element non-editable
@@ -96,7 +103,7 @@
 			function stopEditing(){
 				buttons.children().hide();
 				editEl.show();				
-                editable.attr('contentEditable', false);
+		                editable.attr('contentEditable', false);
 			}
         });
     }
